@@ -118,3 +118,46 @@ exports.deleteBlog = async (req, res) => {
     });
   }
 };
+
+exports.getAllBlog = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 8;
+    const skip = (page - 1) * limit;
+    const search = req.query.search || "";
+    
+    const finalQuery = {};
+    if (search) {
+      finalQuery.title = { $regex: search, $options: "i" };
+    }
+
+    const [blogs, total] = await Promise.all([
+      Blog.find(finalQuery).skip(skip).limit(limit),
+      Blog.countDocuments(finalQuery),
+    ]);
+
+    if (blogs.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No Blog found matching your criteria",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: blogs,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        itemsPerPage: limit,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching Blog",
+      error: error.message,
+    });
+  }
+};

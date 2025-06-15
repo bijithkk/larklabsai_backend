@@ -11,4 +11,6 @@ router.patch("/update/:id",verifyToken,upload.single("coverImage"), blogControll
 
 router.delete("/delete/:id",verifyToken, blogController.deleteBlog);
 
+router.get("/get",blogController.getAllBlog);
+
 module.exports = router;

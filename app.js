@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 const userAuthRouter = require('./routes/authRoutes');
+const blogRouter = require('./routes/blogRoutes');
 
 // APP config
 const app = express();
@@ -12,5 +13,7 @@ app.use(express.json());
 
 //Routes
 app.use('/api/user/auth', userAuthRouter);
+app.use('/api/blog', blogRouter);
+
 
 module.exports = app;

@@ -13,4 +13,6 @@ router.delete("/delete/:id",verifyToken, blogController.deleteBlog);
 
 router.get("/get",blogController.getAllBlog);
 
+router.get("/get/:id",blogController.getBlogById);
+
 module.exports = router;

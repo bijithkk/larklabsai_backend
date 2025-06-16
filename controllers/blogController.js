@@ -50,6 +50,7 @@ exports.updateBlog = async (req, res) => {
   try {
     const blogId = req.params.id;
     const { title, content } = req.body;
+    const userId = req.user.id;
 
     // Find existing blog
     const existingBlog = await Blog.findById(blogId);
@@ -57,6 +58,13 @@ exports.updateBlog = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Blog not found",
+      });
+    }
+
+    if (existingBlog.author.toString() !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to update this blog",
       });
     }
 
@@ -96,19 +104,28 @@ exports.deleteBlog = async (req, res) => {
   try {
     const blogId = req.params.id;
 
-    const deletedBlog = await Blog.findByIdAndDelete(blogId);
+    const blog = await Blog.findById(blogId);
 
-    if (!deletedBlog) {
+    if (!blog) {
       return res.status(404).json({
         success: false,
         message: "Blog not found",
       });
     }
 
+    if (blog.author.toString() !== req.user.id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to delete this blog",
+      });
+    }
+
+    await blog.deleteOne();
+
     res.status(200).json({
       success: true,
       message: "Blog deleted successfully",
-      blog: deletedBlog,
+      blog
     });
   } catch (error) {
     console.error("Error deleting blog:", error);
@@ -132,7 +149,7 @@ exports.getAllBlog = async (req, res) => {
     }
 
     const [blogs, total] = await Promise.all([
-      Blog.find(finalQuery).skip(skip).limit(limit),
+      Blog.find(finalQuery).skip(skip).limit(limit).populate("author"),
       Blog.countDocuments(finalQuery),
     ]);
 
@@ -159,5 +176,22 @@ exports.getAllBlog = async (req, res) => {
       message: "Error fetching Blog",
       error: error.message,
     });
+  }
+};
+
+exports.getBlogById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const blog = await Blog.findById(id).populate('author');
+
+    if (!blog) {
+      return res.status(404).json({ message: 'Blog not found' });
+    }
+
+    res.status(200).json({ blog });
+  } catch (error) {
+    console.error("Error fetching blog:", error);
+    res.status(500).json({ message: 'Server Error' });
   }
 };

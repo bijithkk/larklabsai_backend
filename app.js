@@ -12,8 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 //Routes
-app.use('/api/auth', userAuthRouter);
-app.use('/api/blog', blogRouter);
+app.use('/auth', userAuthRouter);
+app.use('/blog', blogRouter);
 
 
 module.exports = app;

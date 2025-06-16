@@ -15,7 +15,7 @@ const verifyToken = (req, res, next) => {
         next();
 
     } catch (err) {
-        return res.status(401).json({ message: "Invalid or expired token." });
+        return res.status(401).json({ message: "Please Login or Create Account" });
     }
 };
 

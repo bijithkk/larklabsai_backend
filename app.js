@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 //Routes
-app.use('/api/user/auth', userAuthRouter);
+app.use('/api/auth', userAuthRouter);
 app.use('/api/blog', blogRouter);
 
 
